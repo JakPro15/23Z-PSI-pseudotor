@@ -14,7 +14,7 @@ def list_sharing_thread(ip_address: str, buffer_size: int, port: int):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
         listening_socket.bind((ip_address, port))
         listening_socket.listen(5)
-        print("Waiting for requests")
+        print("Waiting for list sharing requests")
         while True:
             conn, addr = listening_socket.accept()
             print(f"Connected to {addr[0]}:{addr[1]}")
@@ -29,3 +29,4 @@ def list_sharing_thread(ip_address: str, buffer_size: int, port: int):
                 nodes = middle_nodes.middle_nodes.get_nodes()
                 conn.send(serialize_middlenodes_list(nodes))
             conn.close()
+            print(f"Shared list to {addr[0]}")
