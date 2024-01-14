@@ -11,8 +11,8 @@ class RegistrantThread(Thread):
         super(RegistrantThread, self).__init__()
 
     def run(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(self.address)
-            while True:
+        while True:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.connect(self.address)
                 sock.send(b"PSEUDOTOR_REGISTER")
-                sleep(self.timeout)
+            sleep(self.timeout)

@@ -1,0 +1,9 @@
+class ServerHandler:
+    def __init__(self, server_address: str):
+        ...
+
+    def send(self, data: bytes):
+        ...
+
+    def receive(self) -> bytes:
+        ...
