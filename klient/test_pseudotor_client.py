@@ -11,8 +11,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
             conn, addr = ssl_socket.accept()
             print(f"Connected to {addr[0]}:{addr[1]}")
             with conn:
-                server_address = conn.recv(1024)
-                conn.sendall(b"Received address. Provide data")
-                data = conn.recv(1024)
+                received_data = conn.recv(1024)
+                server_address = received_data[:4]
+                data = received_data[4:]
                 conn.sendall(data)
             conn.close()
