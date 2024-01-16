@@ -1,0 +1,1 @@
+docker stop z32_project_client; docker rm z32_project_client; docker build --tag z32_project_client . && docker run -it --name z32_project_client --network z32_network z32_project_client z32_project_server
