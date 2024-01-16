@@ -2,30 +2,30 @@ import ssl
 import socket
 
 from registrant_thread import RegistrantThread
-from connection_server import add_connection
+from connection_handling import add_connection
 
+
+REGISTRATION_TIMEOUT = 3 * 60  # seconds
 
 class MiddleNode:
     def __init__(
         self,
-        address: tuple[str, int],
-        overseer: tuple[str, int],
+        own_address: str,
+        overseer_address: str,
         max_delay: float,
         new_segmentation_range: tuple[int, int] | None,
     ):
-        self.address = address
+        self.address = (own_address, 8000)
         self.max_delay = max_delay
         self.segmentation_range = new_segmentation_range
-        self.registrant_thread = RegistrantThread(overseer, 10)
-        self.registrant_thread.start()
-        # TODO: set up real context
+        RegistrantThread(overseer_address, 10).start()
         self.context = ssl.create_default_context()
         self.context.check_hostname = False
         self.context.verify_mode = ssl.CERT_NONE
 
 
     def run(self):
-        RegistrantThread('localhost', 3 * 60).start()
+        RegistrantThread('localhost', REGISTRATION_TIMEOUT).start()
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain('certfile.pem', 'keyfile.key', password='bruh')
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
@@ -41,5 +41,5 @@ class MiddleNode:
 
 
 if __name__ == "__main__":
-    middle_node = MiddleNode(("127.0.0.1", 8000), ("127.0.0.1", 8001), 0, None)
+    middle_node = MiddleNode("127.0.0.1", "127.0.0.1", 0, None)
     middle_node.run()

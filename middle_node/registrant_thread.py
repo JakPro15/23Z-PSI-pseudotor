@@ -5,14 +5,14 @@ from typing import Tuple
 
 
 class RegistrantThread(Thread):
-    def __init__(self, address: Tuple[str, int], timeout: float):
-        self.address = address
+    def __init__(self, overseer_address: str, timeout: float):
+        self.overseer = (overseer_address, 8001)
         self.timeout = timeout
         super(RegistrantThread, self).__init__(daemon=True)
 
     def run(self):
         while True:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect((self.address, 8001))
+                sock.connect(self.overseer)
                 sock.send(b"PSEUDOTOR_REGISTER")
             sleep(self.timeout)
