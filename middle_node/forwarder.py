@@ -1,6 +1,8 @@
 import socket
 from threading import Thread
 
+from packet_modifying import send_segmented
+
 
 MAX_DATA_GATHERING_TIME = 0.05
 CHECKING_FOR_STOP_TIMEOUT = 0.5
@@ -53,10 +55,9 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 from_socket.settimeout(MAX_DATA_GATHERING_TIME)
             to_send.extend(data)
             if len(to_send) > BUFFER_SIZE_THRESHOLD:
-                # TUTAJ MA BYĆ PROPER SEGMENTACJA, NAJLEPIEJ W FUNKCJI ODDZIELNEJ
-                to_socket.sendall(to_send)
+                send_segmented(to_socket, to_send, modification_params)
                 to_send = bytearray()
                 from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
     if len(to_send) > 0:
-        to_socket.sendall(to_send)
+        send_segmented(to_socket, to_send, modification_params)
     forwarder.stop = True

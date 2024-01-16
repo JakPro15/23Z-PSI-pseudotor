@@ -1,5 +1,6 @@
 import ssl
 import socket
+import argparse
 
 from registrant_thread import RegistrantThread
 from connection_handling import add_connection
@@ -40,5 +41,15 @@ class MiddleNode:
 
 
 if __name__ == "__main__":
-    middle_node = MiddleNode("127.0.0.1", "127.0.0.1", 0, None)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--max_delay', '-t', type=float, required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--segsize', '-ss', nargs=2, metavar=('MIN_SEG', 'MAX_SEG'), type=int)
+    group.add_argument('--no-segmentation-change', '-ns', action='store_true')
+    args = parser.parse_args()
+    if args.segsize:
+        assert args.segsize[0] > 0
+        assert args.segsize[0] <= args.segsize[1]
+
+    middle_node = MiddleNode("127.0.0.1", "127.0.0.1", args.max_delay, args.segsize)
     middle_node.run()
