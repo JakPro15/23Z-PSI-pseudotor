@@ -42,6 +42,8 @@ class MiddleNode:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('own_address', nargs=1)
+    parser.add_argument('overseer_address', nargs=1)
     parser.add_argument('--max_delay', '-t', type=float, required=True)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--segsize', '-ss', nargs=2, metavar=('MIN_SEG', 'MAX_SEG'), type=int)
@@ -55,5 +57,8 @@ if __name__ == "__main__":
             print("MIN_SEG has to be less than MAX_SEG")
             exit(2)
 
-    middle_node = MiddleNode("127.0.0.1", "127.0.0.1", args.max_delay, args.segsize)
+    HOST = socket.gethostname(args.own_address)
+    OVERSEER = socket.gethostname(args.overseer_address)
+
+    middle_node = MiddleNode(HOST, OVERSEER, args.max_delay, args.segsize)
     middle_node.run()
