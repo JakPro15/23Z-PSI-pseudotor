@@ -1,6 +1,5 @@
 import socket
 import sys
-import socket
 from threading import Thread
 
 
@@ -10,10 +9,10 @@ def handle_client(conn, addr):
             print(f"Connected to {addr}")
             data = conn.recv(10003)
             print(f"Received {len(data)} bytes of data from {addr}")
-            while b'END' not in data:
+            while b"END" not in data:
                 data = conn.recv(10003)
                 print(f"Received {len(data)} bytes of data from {addr}")
-            conn.sendall(b'END')
+            conn.sendall(b"END")
             print(f"Sent confirmation to {addr}")
             data = conn.recv(3)
             print(f"Received {data}")
@@ -22,7 +21,7 @@ def handle_client(conn, addr):
 
 
 if __name__ == "__main__":
-    HOST = sys.argv[1]
+    HOST = socket.gethostbyname(sys.argv[1])
     PORT = int(sys.argv[2])
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:

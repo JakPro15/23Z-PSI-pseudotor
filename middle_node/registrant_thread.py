@@ -12,7 +12,10 @@ class RegistrantThread(Thread):
 
     def run(self):
         while True:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect(self.overseer)
-                sock.send(b"PSEUDOTOR_REGISTER")
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                    sock.connect(self.overseer)
+                    sock.send(b"PSEUDOTOR_REGISTER")
+            except ConnectionError as e:
+                print(f"{e}")
             sleep(self.timeout)

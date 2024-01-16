@@ -1,13 +1,13 @@
-import ssl
-import socket
 import argparse
+import socket
+import ssl
 import time
 
-from registrant_thread import RegistrantThread
 from connection_handling import add_connection
-
+from registrant_thread import RegistrantThread
 
 REGISTRATION_PERIOD = 3 * 60  # seconds
+
 
 class MiddleNode:
     def __init__(
@@ -24,13 +24,16 @@ class MiddleNode:
         self.context.check_hostname = False
         self.context.verify_mode = ssl.CERT_NONE
 
-
     def run(self):
-        RegistrantThread('localhost', REGISTRATION_PERIOD).start()
+        RegistrantThread("localhost", REGISTRATION_PERIOD).start()
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        context.load_cert_chain('certfile.pem', 'keyfile.key', password='bruh')
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
-            with context.wrap_socket(listening_socket, server_side=True) as ssl_socket:
+        context.load_cert_chain("certfile.pem", "keyfile.key", password="bruh")
+        with socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM
+        ) as listening_socket:
+            with context.wrap_socket(
+                listening_socket, server_side=True
+            ) as ssl_socket:
                 ssl_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 ssl_socket.bind(self.address)
                 ssl_socket.listen(5)
@@ -43,12 +46,14 @@ class MiddleNode:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('own_address', nargs=1)
-    parser.add_argument('overseer_address', nargs=1)
-    parser.add_argument('--max_delay', '-t', type=float, required=True)
+    parser.add_argument("own_address", nargs=1)
+    parser.add_argument("overseer_address", nargs=1)
+    parser.add_argument("--max_delay", "-t", type=float, required=True)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--segsize', '-ss', nargs=2, metavar=('MIN_SEG', 'MAX_SEG'), type=int)
-    group.add_argument('--no-segmentation-change', '-ns', action='store_true')
+    group.add_argument(
+        "--segsize", "-ss", nargs=2, metavar=("MIN_SEG", "MAX_SEG"), type=int
+    )
+    group.add_argument("--no-segmentation-change", "-ns", action="store_true")
     args = parser.parse_args()
     if args.segsize:
         if args.segsize[0] <= 0:

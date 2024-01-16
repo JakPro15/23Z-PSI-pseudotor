@@ -1,0 +1,42 @@
+version: '3.0'
+services:
+  server:
+    container_name: "z32_server"
+    build:
+      context: "./server"
+      dockerfile: "Dockerfile"
+    tty: true
+    networks:
+      - z32_network
+
+  overseer:
+    container_name: "z32_overseer"
+    build:
+      context: "./overseer"
+      dockerfile: "Dockerfile"
+    tty: true
+    networks:
+      - z32_network
+
+  middle_node:
+    container_name: "z32_middle_node"
+    build:
+      context: "./middle_node"
+      dockerfile: "Dockerfile"
+    tty: true
+    networks:
+      - z32_network
+
+  client:
+    container_name: "z32_client"
+    build:
+      context: "./client"
+      dockerfile: "Dockerfile"
+    tty: true
+    networks:
+      - z32_network
+
+networks:
+  z32_network:
+    name: z32_network
+    external: true

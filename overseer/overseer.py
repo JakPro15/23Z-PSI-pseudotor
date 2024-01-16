@@ -1,6 +1,7 @@
 import socket
 import sys
 from threading import Thread
+
 from request_handling import handle_request
 
 if __name__ == "__main__":
@@ -20,4 +21,10 @@ if __name__ == "__main__":
         print(f"Overseer open on address {(HOST, PORT)}")
         while True:
             conn, addr = listening_socket.accept()
-            Thread(None, handle_request, None, (conn, addr, BUFFER_SIZE), daemon=True).start()
+            Thread(
+                None,
+                handle_request,
+                None,
+                (conn, addr, BUFFER_SIZE),
+                daemon=True,
+            ).start()
