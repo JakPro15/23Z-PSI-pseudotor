@@ -14,6 +14,8 @@ def handle_client(conn, addr):
                 print(f"Received {len(data)} bytes of data from {addr}")
             conn.sendall(b'END')
             print(f"Sent confirmation to {addr}")
+            data = conn.recv(3)
+            print(f"Received {data}")
     except Exception:
         print(f"An error occurred in communication with {addr}")
 

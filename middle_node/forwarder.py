@@ -52,7 +52,7 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 # TUTAJ MA BYĆ PROPER SEGMENTACJA, NAJLEPIEJ W FUNKCJI ODDZIELNEJ
                 for i in range(20):
                     to_socket.sendall(to_send[100 * i:100 * (i + 1)])
-                    time.sleep(0.5)
+                    # time.sleep(0.5)
                 to_send = bytearray()
     if len(to_send) > 0:
         print(f"{name}: Sending {to_send}")

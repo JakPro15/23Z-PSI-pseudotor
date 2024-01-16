@@ -12,6 +12,7 @@ if __name__ == "__main__":
         connecting_socket.sendall(b'A' * 10000 + b'END')
         data = connecting_socket.recv(1024)
         if data == b'END':
+            connecting_socket.sendall(b'Bye')
             print(f"Received confirmation from {(HOST, PORT)}. Shutting down.")
         else:
             print(f"Invalid confirmation of len {len(data)}: {data}")
