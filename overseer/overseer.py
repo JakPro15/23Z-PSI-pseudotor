@@ -14,9 +14,10 @@ if __name__ == "__main__":
     PORT = 8001
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
+        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listening_socket.bind((HOST, PORT))
         listening_socket.listen(5)
-        print("Waiting for list sharing requests")
+        print(f"Overseer open on address {(HOST, PORT)}")
         while True:
             conn, addr = listening_socket.accept()
             handler = Thread(None, handle_request, None, (conn, addr, BUFFER_SIZE), daemon=True)

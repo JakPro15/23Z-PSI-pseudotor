@@ -1,35 +1,45 @@
-import collections
-from ssl import SSLContext
 from threading import Thread
-from typing import Dict, Tuple
+import ssl
+import socket
 
-from client_handler import ClientHandler
-
-from middle_node.server_handler import ServerHandler
-
-
-def handle_connection(address: Tuple[str, int], context: SSLContext):
-    client_handler = ClientHandler(address, context)
-    addr, data = client_handler.get_server_and_data()
-    server_handler = ServerHandler((addr, 8000))
-    server_handler.send(data)
-    response = server_handler.receive()
-    client_handler.send_to_client(response)
+from forwarder import Forwarder
+from registrant_thread import RegistrantThread
 
 
-class ConnectionServer:
-    def __init__(self):
-        self.threads: Dict[Tuple[str, int], Thread] = {}
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain('../client/certfile.pem', '../client/keyfile.key', password='bruh')
 
-    def add_connection(self, address: Tuple[str, int], context: SSLContext):
-        assert address not in self.threads
-        handler = Thread(
-            target=handle_connection,
-            args=(address, context),
-            daemon=True,
-        )
-        handler.start()
-        self.threads[address] = handler
 
-    def remove_old_connections(self):
-        self.threads = {k: v for k, v in self.threads.items() if v.is_alive()}
+def handle_connection(client_socket: ssl.SSLSocket):
+    with client_socket:
+        data = client_socket.recv(6)
+        server_address = socket.inet_ntoa(data[:4])
+        server_port = int.from_bytes(data[4:6], byteorder='big', signed=False)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+            server_socket.connect((server_address, server_port))
+            Forwarder(client_socket, server_socket).run()
+
+
+def add_connection(client_socket: ssl.SSLSocket):
+    Thread(
+        target=handle_connection,
+        args=(client_socket,),
+        daemon=True,
+    ).start()
+
+
+HOST = 'localhost'
+PORT = 8000
+if __name__ == '__main__':
+    RegistrantThread('localhost', 3 * 60).start()
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain('../client/certfile.pem', '../client/keyfile.key', password='bruh')
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
+        with context.wrap_socket(listening_socket, server_side=True) as ssl_socket:
+            ssl_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            ssl_socket.bind((HOST, PORT))
+            ssl_socket.listen(5)
+            print(f"Waiting for data on address {(HOST, PORT)}")
+            while True:
+                conn, addr = ssl_socket.accept()
+                add_connection(conn)

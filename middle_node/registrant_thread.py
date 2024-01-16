@@ -13,6 +13,6 @@ class RegistrantThread(Thread):
     def run(self):
         while True:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect(self.address)
+                sock.connect((self.address, 8001))
                 sock.send(b"PSEUDOTOR_REGISTER")
             sleep(self.timeout)

@@ -1,9 +1,11 @@
 import socket
 import time
+import ssl
 from threading import Thread
 
 
-BUFFER_TIMEOUT = 0.2
+BUFFER_TIMEOUT = 0.05
+STOP_CHECKING_TIMEOUT = 0.5
 BUFFER_SIZE_THRESHOLD = 2000
 
 
@@ -38,6 +40,7 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
             if len(to_send) > 0:
                 to_socket.send(to_send)
                 to_send = bytearray()
+            from_socket.settimeout(STOP_CHECKING_TIMEOUT)
         except Exception:
             print(f"{name}: Error")
             return
@@ -46,34 +49,16 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 print(f"{name}: Shutdown")
                 break
             print(f"{name}: Appending")
+            if len(to_send) == 0:
+                from_socket.settimeout(BUFFER_TIMEOUT)
             to_send.extend(data)
             if len(to_send) > BUFFER_SIZE_THRESHOLD:
                 print(f"{name}: Sending")
                 # TUTAJ MA BYĆ PROPER SEGMENTACJA, NAJLEPIEJ W FUNKCJI ODDZIELNEJ
-                for i in range(20):
-                    to_socket.sendall(to_send[100 * i:100 * (i + 1)])
-                    # time.sleep(0.5)
+                to_socket.sendall(to_send)
                 to_send = bytearray()
     if len(to_send) > 0:
         print(f"{name}: Sending {to_send}")
         to_socket.sendall(to_send)
     forwarder.stop = True
     print(f"{name}: End")
-
-
-HOST = 'localhost'
-PORT = 5555
-SERVER = 'localhost'
-SERVER_PORT = 8000
-if __name__ == '__main__':
-     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listening_socket.bind((HOST, PORT))
-        listening_socket.listen(5)
-        print(f"Waiting for data on address {(HOST, PORT)}")
-        while True:
-            conn, addr = listening_socket.accept()
-            with conn:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connecting_socket:
-                    connecting_socket.connect((SERVER, SERVER_PORT))
-                    Forwarder(conn, connecting_socket).run()

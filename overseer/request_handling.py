@@ -16,11 +16,12 @@ def handle_request(conn: socket.socket, addr: tuple, buffer_size: int):
             do_list_sharing(conn)
         else:
             print("Invalid request for the overseer service.")
-    conn.close()
+    print(f"Request from {addr} handled")
 
 
 def do_registration(addr: tuple):
     middle_nodes.middle_nodes.add_node(addr[0])
+    print(f"Registered {addr[0]} as middle node")
 
 
 def serialize_middlenodes_list(middle_nodes_list: list[str]) -> bytes:
@@ -33,4 +34,5 @@ def serialize_middlenodes_list(middle_nodes_list: list[str]) -> bytes:
 
 def do_list_sharing(conn: socket.socket):
     nodes = middle_nodes.middle_nodes.get_nodes()
+    print(f"Sending {len(nodes)} nodes")
     conn.send(serialize_middlenodes_list(nodes))

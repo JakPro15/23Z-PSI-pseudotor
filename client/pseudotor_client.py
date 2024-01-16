@@ -3,12 +3,12 @@ import socket
 from middle_node_chooser import choose_middle_node
 from contextlib import contextmanager
 
-MIDDLE_NODE_PORT = 8002
+MIDDLE_NODE_PORT = 8000
 
 @contextmanager
 def pseudotor_wrap(connecting_socket: socket.socket, server_address: str, port: int, overseer_address: str):
     middle_node = choose_middle_node(overseer_address)
-    print("Selected middle node")
+    print(f"Selected middle node: {middle_node}")
 
     context = ssl.create_default_context()
     context.check_hostname = False
