@@ -8,7 +8,7 @@ class RegistrantThread(Thread):
     def __init__(self, address: Tuple[str, int], timeout: float):
         self.address = address
         self.timeout = timeout
-        super(RegistrantThread, self).__init__()
+        super(RegistrantThread, self).__init__(daemon=True)
 
     def run(self):
         while True:
