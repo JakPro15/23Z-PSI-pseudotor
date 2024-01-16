@@ -48,8 +48,12 @@ if __name__ == "__main__":
     group.add_argument('--no-segmentation-change', '-ns', action='store_true')
     args = parser.parse_args()
     if args.segsize:
-        assert args.segsize[0] > 0
-        assert args.segsize[0] <= args.segsize[1]
+        if args.segsize[0] <= 0:
+            print("Segmentation param has to be positive")
+            exit(1)
+        if args.segsize[0] > args.segsize[1]:
+            print("MIN_SEG has to be less than MAX_SEG")
+            exit(2)
 
     middle_node = MiddleNode("127.0.0.1", "127.0.0.1", args.max_delay, args.segsize)
     middle_node.run()
