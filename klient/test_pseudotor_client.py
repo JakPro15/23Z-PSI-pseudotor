@@ -11,10 +11,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
             conn, addr = ssl_socket.accept()
             print(f"Connected to {addr[0]}:{addr[1]}")
             with conn:
-                received_data = conn.recv(1024)
-                print(f"Received {received_data}")
-                server_address = received_data[:4]
-                data = received_data[4:]
-                conn.sendall(data)
-                print(f"Sent {data}")
+                data = conn.recv(1024)
+                for i in range(3):
+                    conn.send(data[4:])
             conn.close()
