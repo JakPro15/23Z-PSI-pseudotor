@@ -1,84 +1,114 @@
-version: '3.0'
+version: "3.0"
 x-server: &server
-  build:
-    context: "./server"
-    dockerfile: "Dockerfile"
-  tty: true
-  networks:
-    - z32_network
-
-x-client: &client
-  build:
-    context: "./client"
-    dockerfile: "Dockerfile"
-  tty: true
-  networks:
-    - z32_network
-
-x-node: &node
-  build:
-    context: "./middle_node"
-    dockerfile: "Dockerfile"
-  tty: true
-  networks:
-    - z32_network
-
-services:
-  server1:
-    <<: *server
-    container_name: "z32_server1"
-    entrypoint: [ "python", "./server.py", "z32_server1", "8002" ]
-
-  server2:
-    <<: *server
-    container_name: "z32_server2"
-    entrypoint: [ "python", "./server.py", "z32_server2", "8002" ]
-
-  server3:
-    <<: *server
-    container_name: "z32_server3"
-    entrypoint: [ "python", "./server.py", "z32_server3", "8002" ]
-
-  overseer:
-    container_name: "z32_overseer"
     build:
-      context: "./overseer"
-      dockerfile: "Dockerfile"
+        context: "./server"
+        dockerfile: "Dockerfile"
     tty: true
     networks:
-      - z32_network
+        - z32_network
 
-  node1:
-    <<: *node
-    container_name: "z32_node1"
-    entrypoint: [ "python", "./middle_node.py", "z32_node1","z32_overseer" ]
+x-client: &client
+    build:
+        context: "./client"
+        dockerfile: "Dockerfile"
+    tty: true
+    networks:
+        - z32_network
 
-  node2:
-    <<: *node
-    container_name: "z32_node2"
-    entrypoint: [ "python", "./middle_node.py", "z32_node2","z32_overseer" ]
+x-node: &node
+    build:
+        context: "./middle_node"
+        dockerfile: "Dockerfile"
+    tty: true
+    networks:
+        - z32_network
 
-  node3:
-    <<: *node
-    container_name: "z32_node3"
-    entrypoint: [ "python", "./middle_node.py", "z32_node3","z32_overseer" ]
+services:
+    server1:
+        <<: *server
+        container_name: "z32_server1"
+        entrypoint: ["python", "./server.py", "z32_server1", "8002"]
 
-  client1:
-    <<: *client
-    container_name: "z32_client1"
-    entrypoint: [ "python", "./client.py", "z32_server1", "8002", "z32_overseer" ]
+    server2:
+        <<: *server
+        container_name: "z32_server2"
+        entrypoint: ["python", "./server.py", "z32_server2", "8002"]
 
-  client2:
-    <<: *client
-    container_name: "z32_client2"
-    entrypoint: [ "python", "./client.py", "z32_server2", "8002", "z32_overseer" ]
+    server3:
+        <<: *server
+        container_name: "z32_server3"
+        entrypoint: ["python", "./server.py", "z32_server3", "8002"]
 
-  client3:
-    <<: *client
-    container_name: "z32_client3"
-    entrypoint: [ "python", "./client.py", "z32_server3", "8002", "z32_overseer" ]
+    overseer:
+        container_name: "z32_overseer"
+        build:
+            context: "./overseer"
+            dockerfile: "Dockerfile"
+        tty: true
+        networks:
+            - z32_network
+
+    node1:
+        <<: *node
+        container_name: "z32_node1"
+        entrypoint:
+            [
+                "python",
+                "./middle_node.py",
+                "z32_node1",
+                "z32_overseer",
+                "-t",
+                "0.01",
+                "-ns",
+            ]
+
+    node2:
+        <<: *node
+        container_name: "z32_node2"
+        entrypoint:
+            [
+                "python",
+                "./middle_node.py",
+                "z32_node2",
+                "z32_overseer",
+                "-t",
+                "0.01",
+                "-ns",
+            ]
+
+    node3:
+        <<: *node
+        container_name: "z32_node3"
+        entrypoint:
+            [
+                "python",
+                "./middle_node.py",
+                "z32_node3",
+                "z32_overseer",
+                "-t",
+                "0.01",
+                "-ns",
+            ]
+
+    client1:
+        <<: *client
+        container_name: "z32_client1"
+        entrypoint:
+            ["python", "./client.py", "z32_server1", "8002", "z32_overseer"]
+
+    client2:
+        <<: *client
+        container_name: "z32_client2"
+        entrypoint:
+            ["python", "./client.py", "z32_server2", "8002", "z32_overseer"]
+
+    client3:
+        <<: *client
+        container_name: "z32_client3"
+        entrypoint:
+            ["python", "./client.py", "z32_server3", "8002", "z32_overseer"]
 
 networks:
-  z32_network:
-    name: z32_network
-    external: true
+    z32_network:
+        name: z32_network
+        external: true

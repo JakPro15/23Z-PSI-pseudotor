@@ -63,9 +63,9 @@ if __name__ == "__main__":
             print("MIN_SEG has to be less than MAX_SEG")
             exit(2)
 
-    HOST = socket.gethostname(args.own_address)
-    OVERSEER = socket.gethostname(args.overseer_address)
+    HOST = socket.gethostbyname(args.own_address[0])
+    OVERSEER = socket.gethostbyname(args.overseer_address[0])
 
     middle_node = MiddleNode(HOST, OVERSEER, args.max_delay, args.segsize)
-    time.sleep(0.5)
+    time.sleep(1)
     middle_node.run()
