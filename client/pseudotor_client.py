@@ -1,29 +1,27 @@
 import ssl
 import socket
 from middle_node_chooser import choose_middle_node
+from contextlib import contextmanager
 
 MIDDLE_NODE_PORT = 8002
 
-def get_data_from_server(overseer_address: str, destination_address: str, data: str, buffer_size: int) -> str:
-    print("Selecting middle node")
-    middle_node = choose_middle_node(overseer_address, buffer_size)
+@contextmanager
+def pseudotor_wrap(connecting_socket: socket.socket, server_address: str, port: int, overseer_address: str):
+    middle_node = choose_middle_node(overseer_address)
+    print("Selected middle node")
+
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connecting_socket:
-        with context.wrap_socket(connecting_socket, server_hostname='127.0.0.1') as ssl_socket:
-            ssl_socket.connect((middle_node, MIDDLE_NODE_PORT))
-            to_send = bytearray()
-            to_send.extend(socket.inet_aton(destination_address))
-            to_send.extend(data)
-            ssl_socket.sendall(to_send)
-            print("Sending server address and data")
 
-            return_buffer = bytearray()
-            while True:
-                response = ssl_socket.recv(buffer_size)
-                if not response:
-                    break
-                return_buffer.extend(response)
+    ssl_socket = context.wrap_socket(connecting_socket)
+    ssl_socket.connect((middle_node, MIDDLE_NODE_PORT))
+    data = bytearray(socket.inet_aton(server_address))
+    data.extend(port.to_bytes(2, 'big', signed=False))
+    ssl_socket.sendall(data)
+    print("Sent server address and port number")
 
-            return bytes(return_buffer)
+    try:
+        yield ssl_socket
+    finally:
+        ssl_socket.close()
