@@ -6,10 +6,6 @@ from forwarder import Forwarder
 from registrant_thread import RegistrantThread
 
 
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-context.load_cert_chain('../client/certfile.pem', '../client/keyfile.key', password='bruh')
-
-
 def handle_connection(client_socket: ssl.SSLSocket):
     with client_socket:
         data = client_socket.recv(6)
@@ -28,18 +24,18 @@ def add_connection(client_socket: ssl.SSLSocket):
     ).start()
 
 
-HOST = 'localhost'
-PORT = 8000
-if __name__ == '__main__':
-    RegistrantThread('localhost', 3 * 60).start()
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('../client/certfile.pem', '../client/keyfile.key', password='bruh')
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
-        with context.wrap_socket(listening_socket, server_side=True) as ssl_socket:
-            ssl_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            ssl_socket.bind((HOST, PORT))
-            ssl_socket.listen(5)
-            print(f"Waiting for data on address {(HOST, PORT)}")
-            while True:
-                conn, addr = ssl_socket.accept()
-                add_connection(conn)
+# HOST = 'localhost'
+# PORT = 8000
+# if __name__ == '__main__':
+#     RegistrantThread('localhost', 3 * 60).start()
+#     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+#     context.load_cert_chain('certfile.pem', 'keyfile.key', password='bruh')
+#     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
+#         with context.wrap_socket(listening_socket, server_side=True) as ssl_socket:
+#             ssl_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#             ssl_socket.bind((HOST, PORT))
+#             ssl_socket.listen(5)
+#             print(f"Waiting for data on address {(HOST, PORT)}")
+#             while True:
+#                 conn, addr = ssl_socket.accept()
+#                 add_connection(conn)
