@@ -1,6 +1,7 @@
 import ssl
 import socket
 import argparse
+import time
 
 from registrant_thread import RegistrantThread
 from connection_handling import add_connection
@@ -61,4 +62,5 @@ if __name__ == "__main__":
     OVERSEER = socket.gethostname(args.overseer_address)
 
     middle_node = MiddleNode(HOST, OVERSEER, args.max_delay, args.segsize)
+    time.sleep(0.5)
     middle_node.run()

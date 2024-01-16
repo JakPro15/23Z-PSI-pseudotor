@@ -1,5 +1,6 @@
 import sys
 import socket
+import time
 from pseudotor_client import pseudotor_wrap
 
 
@@ -8,6 +9,7 @@ if __name__ == "__main__":
     PORT = int(sys.argv[2])
     OVERSEER = socket.gethostbyname(sys.argv[3])
 
+    time.sleep(1)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connecting_socket:
         with pseudotor_wrap(connecting_socket, SERVER, PORT, OVERSEER) as wrapped_socket:
             print(f"Sending data to address {(SERVER, PORT)}")
