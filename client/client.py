@@ -4,6 +4,7 @@ import time
 
 from pseudotor_client import pseudotor_wrap
 
+
 if __name__ == "__main__":
     SERVER = socket.gethostbyname(sys.argv[1])
     PORT = int(sys.argv[2])

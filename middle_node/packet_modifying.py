@@ -2,6 +2,7 @@ import socket
 from random import randint, uniform
 from time import sleep
 
+
 def segment_data(data: bytearray, seg_min: int, seg_max: int) -> list[bytearray]:
     slices = []
     position = 0
@@ -14,6 +15,7 @@ def segment_data(data: bytearray, seg_min: int, seg_max: int) -> list[bytearray]
     slices.append(data[position:])
 
     return slices
+
 
 def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_params):
     if modification_params[1] is not None:

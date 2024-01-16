@@ -4,6 +4,7 @@ from threading import Thread
 
 from request_handling import handle_request
 
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         HOST = socket.gethostbyname(sys.argv[1])

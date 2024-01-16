@@ -1,8 +1,10 @@
 import socket
 from random import choice
 
+
 LIST_SHARING_PORT = 8001
 BUFFER_SIZE = 1024
+
 
 def _get_middle_node_list(overseer_address: str) -> list[str]:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as overseer_socket:
@@ -14,6 +16,7 @@ def _get_middle_node_list(overseer_address: str) -> list[str]:
             received.extend(data)
             data = overseer_socket.recv(BUFFER_SIZE)
         return received.decode('ascii').split(" ")[:-1]
+
 
 def choose_middle_node(overseer_address: str) -> str:
     middle_nodes = _get_middle_node_list(overseer_address)

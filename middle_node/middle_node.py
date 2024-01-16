@@ -6,6 +6,7 @@ import time
 from connection_handling import add_connection
 from registrant_thread import RegistrantThread
 
+
 REGISTRATION_PERIOD = 3 * 60  # seconds
 
 

@@ -3,7 +3,9 @@ import socket
 from middle_node_chooser import choose_middle_node
 from contextlib import contextmanager
 
+
 MIDDLE_NODE_PORT = 8000
+
 
 @contextmanager
 def pseudotor_wrap(connecting_socket: socket.socket, server_address: str, port: int, overseer_address: str):
