@@ -13,3 +13,5 @@ if __name__ == "__main__":
         data = connecting_socket.recv(1024)
         if data == b'END':
             print(f"Received confirmation from {(HOST, PORT)}. Shutting down.")
+        else:
+            print(f"Invalid confirmation of len {len(data)}: {data}")
