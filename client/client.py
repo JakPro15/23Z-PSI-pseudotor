@@ -2,31 +2,18 @@ import sys
 import socket
 from pseudotor_client import pseudotor_wrap
 
+
 if __name__ == "__main__":
-    if len(sys.argv) == 4:
-        SERVER = socket.gethostbyname(sys.argv[1])
-        SERVER_PORT = int(sys.argv[2])
-        OVERSEER = socket.gethostbyname(sys.argv[3])
-    else:
-        print("Client takes three arguments: SERVER, SERVER_PORT, OVERSEER")
-        exit(1)
-
-    BUFFER_SIZE = 1024
-
-    data = b"Hello!"
+    HOST = sys.argv[1]
+    PORT = int(sys.argv[2])
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connecting_socket:
-        with pseudotor_wrap(connecting_socket, SERVER, SERVER_PORT, OVERSEER) as pt_socket:
-            pt_socket.sendall(data)
-            pt_socket.sendall(b'END')
-
-            response_buffer = bytearray()
-            while True:
-                response = pt_socket.recv(BUFFER_SIZE)
-                if not response:
-                    break
-                response_buffer.extend(response)
-
-            print(f"Data: {data}")
-            print(f"Response: {bytes(response_buffer)}")
-
+        with pseudotor_wrap(connecting_socket, HOST, PORT, '127.0.0.1') as wrapped_socket:
+            print(f"Sending data to address {(HOST, PORT)}")
+            wrapped_socket.sendall(b'A' * 10000 + b'END')
+            data = wrapped_socket.recv(1024)
+            if data == b'END':
+                wrapped_socket.sendall(b'Bye')
+                print(f"Received confirmation from {(HOST, PORT)}. Shutting down.")
+            else:
+                print(f"Invalid confirmation of len {len(data)}: {data}")
