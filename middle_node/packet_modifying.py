@@ -18,10 +18,16 @@ def segment_data(data: bytearray, seg_min: int, seg_max: int) -> list[bytearray]
 
 
 def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_params):
-    if modification_params[1] is not None:
-        for slice in segment_data(to_send, modification_params[1][0], modification_params[1][1]):
+    try:
+        if modification_params[1] is not None:
+            for slice in segment_data(to_send, modification_params[1][0], modification_params[1][1]):
+                sleep(uniform(0, modification_params[0]))
+                to_socket.sendall(slice)
+        else:
             sleep(uniform(0, modification_params[0]))
-            to_socket.sendall(slice)
-    else:
-        sleep(uniform(0, modification_params[0]))
-        to_socket.sendall(to_send)
+            to_socket.sendall(to_send)
+
+    except socket.error as e:
+        print(f"Socket error during segmented sending: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred during segmented sending: {e}")

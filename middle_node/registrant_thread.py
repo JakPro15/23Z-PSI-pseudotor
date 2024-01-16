@@ -1,7 +1,6 @@
 import socket
 from threading import Thread
 from time import sleep
-from typing import Tuple
 
 
 class RegistrantThread(Thread):
@@ -18,4 +17,9 @@ class RegistrantThread(Thread):
                     sock.send(b"PSEUDOTOR_REGISTER")
             except ConnectionError as e:
                 print(f"{e}")
+            except socket.error as e:
+                print(f"Socket error: {e}")
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
+
             sleep(self.timeout)

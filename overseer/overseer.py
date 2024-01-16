@@ -6,26 +6,32 @@ from request_handling import handle_request
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        HOST = socket.gethostbyname(sys.argv[1])
-    else:
-        print("Overseer server takes one argument: HOST - own hostname")
-        exit(1)
+    try:
+        if len(sys.argv) == 2:
+            HOST = socket.gethostbyname(sys.argv[1])
+        else:
+            print("Overseer server takes one argument: HOST - own hostname")
+            exit(1)
 
-    BUFFER_SIZE = 32
-    PORT = 8001
+        BUFFER_SIZE = 32
+        PORT = 8001
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
-        listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listening_socket.bind((HOST, PORT))
-        listening_socket.listen(5)
-        print(f"Overseer open on address {(HOST, PORT)}")
-        while True:
-            conn, addr = listening_socket.accept()
-            Thread(
-                None,
-                handle_request,
-                None,
-                (conn, addr, BUFFER_SIZE),
-                daemon=True,
-            ).start()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
+            listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            listening_socket.bind((HOST, PORT))
+            listening_socket.listen(5)
+            print(f"Overseer open on address {(HOST, PORT)}")
+            while True:
+                try:
+                    conn, addr = listening_socket.accept()
+                    Thread(
+                        None,
+                        handle_request,
+                        None,
+                        (conn, addr, BUFFER_SIZE),
+                        daemon=True,
+                    ).start()
+                except Exception as e:
+                    print(f"Error accepting connection: {e}")
+    except Exception as e:
+        print(f"Error starting overseer server: {e}")
