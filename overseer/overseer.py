@@ -7,7 +7,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         HOST = socket.gethostbyname(sys.argv[1])
     else:
-        print("Server takes one argument: HOST")
+        print("Overseer server takes one argument: HOST - own hostname")
         exit(1)
 
     BUFFER_SIZE = 32
@@ -20,5 +20,4 @@ if __name__ == "__main__":
         print(f"Overseer open on address {(HOST, PORT)}")
         while True:
             conn, addr = listening_socket.accept()
-            handler = Thread(None, handle_request, None, (conn, addr, BUFFER_SIZE), daemon=True)
-            handler.start()
+            Thread(None, handle_request, None, (conn, addr, BUFFER_SIZE), daemon=True).start()

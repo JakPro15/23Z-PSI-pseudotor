@@ -1,6 +1,4 @@
 import socket
-import time
-import ssl
 from threading import Thread
 
 
@@ -10,14 +8,21 @@ BUFFER_SIZE_THRESHOLD = 2000
 
 
 class Forwarder:
-    def __init__(self, client_socket: socket.socket, server_socket: socket.socket):
+    def __init__(self, client_socket: socket.socket, server_socket: socket.socket, modification_params):
         self.stop = False
         self.client_socket = client_socket
         self.server_socket = server_socket
+        self.modification_params = modification_params
 
     def run(self):
-        client_to_server = Thread(None, forward, None, (self, self.client_socket, self.server_socket, "client_to_server"))
-        server_to_client = Thread(None, forward, None, (self, self.server_socket, self.client_socket, "server_to_client"))
+        client_to_server = Thread(
+            None, forward, None,
+            (self, self.client_socket, self.server_socket, self.modification_params, "client_to_server")
+        )
+        server_to_client = Thread(
+            None, forward, None,
+            (self, self.server_socket, self.client_socket, self.modification_params, "server_to_client")
+        )
         client_to_server.start()
         server_to_client.start()
         client_to_server.join()
@@ -26,7 +31,8 @@ class Forwarder:
         self.server_socket.close()
 
 
-def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.socket, name: str):
+def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.socket, modification_params, name: str):
+    print(f"Forwarding with params: {modification_params}")
     to_send = bytearray()
     from_socket.settimeout(MAX_DATA_GATHERING_TIME)
     while not forwarder.stop:
@@ -38,7 +44,7 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 to_send = bytearray()
             from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
         except Exception as e:
-            print(f"Exception excountered in {name} thread: {e}")
+            print(f"Exception encountered in {name} thread: {e}")
             return
         else:
             if data == b'':
