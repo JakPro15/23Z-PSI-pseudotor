@@ -34,7 +34,6 @@ class Forwarder:
 
 
 def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.socket, modification_params, name: str):
-    print(f"Forwarding with params: {modification_params}")
     to_send = bytearray()
     from_socket.settimeout(MAX_DATA_GATHERING_TIME)
     while not forwarder.stop:
@@ -42,7 +41,7 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
             data = from_socket.recv(1024)
         except TimeoutError:
             if len(to_send) > 0:
-                to_socket.send(to_send)
+                send_segmented(to_socket, to_send, modification_params)
                 to_send = bytearray()
             from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
         except Exception as e:

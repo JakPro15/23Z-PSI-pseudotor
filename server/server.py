@@ -11,7 +11,7 @@ def handle_client(conn, addr):
             data = conn.recv(10003)
             print(f"Received {len(data)} bytes of data from {addr}")
             while b'END' not in data:
-                data = conn.recv(1024)
+                data = conn.recv(10003)
                 print(f"Received {len(data)} bytes of data from {addr}")
             conn.sendall(b'END')
             print(f"Sent confirmation to {addr}")
