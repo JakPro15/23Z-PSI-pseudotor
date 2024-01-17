@@ -24,6 +24,10 @@ if __name__ == "__main__":
             while True:
                 try:
                     conn, addr = listening_socket.accept()
+                except Exception as e:
+                    print(f"Error accepting a connection. Error message: {e}")
+                    break
+                try:
                     Thread(
                         None,
                         handle_request,
@@ -32,6 +36,7 @@ if __name__ == "__main__":
                         daemon=True,
                     ).start()
                 except Exception as e:
-                    print(f"Error accepting connection: {e}")
+                    print(f"Error starting thread to handle connection. Error message: {e}")
+                    break
     except Exception as e:
-        print(f"Error starting overseer server: {e}")
+        print(f"Error starting overseer server. Error message: {e}")

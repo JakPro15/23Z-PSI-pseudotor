@@ -21,13 +21,11 @@ if __name__ == "__main__":
                 data = wrapped_socket.recv(1024)
                 if data == b"END":
                     wrapped_socket.sendall(b"Bye")
-                    print(
-                        f"Received confirmation from {(SERVER, PORT)}. Shutting down."
-                    )
+                    print(f"Received confirmation from {(SERVER, PORT)}. Shutting down.")
+                elif data == b'':
+                    print(f"Server connection aborted.")
                 else:
                     print(f"Invalid confirmation of len {len(data)}: {data}")
 
-    except socket.error as e:
-        print(f"Socket error: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"Error occurred with message: {e}")

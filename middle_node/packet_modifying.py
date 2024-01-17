@@ -26,8 +26,6 @@ def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_pa
         else:
             sleep(uniform(0, modification_params[0]))
             to_socket.sendall(to_send)
-
-    except socket.error as e:
-        print(f"Socket error during segmented sending: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred during segmented sending: {e}")
+        print(f"Exception encountered when sending segmented data. Error message: {e}")
+        raise

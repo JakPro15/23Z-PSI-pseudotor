@@ -1,5 +1,6 @@
 import socket
 from random import choice
+from exceptions import OverseerUnavailableError, MiddleNodeUnavailableError
 
 
 LIST_SHARING_PORT = 8001
@@ -17,27 +18,12 @@ def _get_middle_node_list(overseer_address: str) -> list[str]:
                 received.extend(data)
                 data = overseer_socket.recv(BUFFER_SIZE)
             return received.decode('ascii').split(" ")[:-1]
-
-    except ConnectionError as e:
-        print(f"Connection error: {e}")
-    except socket.timeout as e:
-        print(f"Socket timeout: {e}")
-    except socket.error as e:
-        print(f"Socket error: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    return []
+        raise OverseerUnavailableError("Failed to obtain middle nodes list from overseer.") from e
 
 
 def choose_middle_node(overseer_address: str) -> str:
-    try:
-        middle_nodes = _get_middle_node_list(overseer_address)
-        print(middle_nodes)
-        if len(middle_nodes) == 0:
-            raise LookupError("No middle nodes are available")
-        return choice(middle_nodes)
-    except LookupError as e:
-        print(f"Lookup error: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    return ""
+    middle_nodes = _get_middle_node_list(overseer_address)
+    if len(middle_nodes) == 0:
+        raise MiddleNodeUnavailableError("No PseudoTor middle nodes are registered.")
+    return choice(middle_nodes)

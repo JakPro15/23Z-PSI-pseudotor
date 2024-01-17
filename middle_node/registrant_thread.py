@@ -15,11 +15,6 @@ class RegistrantThread(Thread):
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                     sock.connect(self.overseer)
                     sock.send(b"PSEUDOTOR_REGISTER")
-            except ConnectionError as e:
-                print(f"{e}")
-            except socket.error as e:
-                print(f"Socket error: {e}")
             except Exception as e:
-                print(f"An unexpected error occurred: {e}")
-
+                print(f"Failed to register to overseer. Error message: {e}")
             sleep(self.timeout)

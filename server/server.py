@@ -4,13 +4,19 @@ from threading import Thread
 
 
 def handle_client(conn, addr):
+    buffer = bytearray()
     try:
         with conn:
             print(f"Connected to {addr}")
             data = conn.recv(10003)
+            buffer.extend(data)
             print(f"Received {len(data)} bytes of data from {addr}")
-            while b"END" not in data:
+            while b"END" not in buffer:
                 data = conn.recv(10003)
+                buffer.extend(data)
+                if data == b'':
+                    print("Client connection aborted.")
+                    return
                 print(f"Received {len(data)} bytes of data from {addr}")
             conn.sendall(b"END")
             print(f"Sent confirmation to {addr}")
@@ -37,4 +43,4 @@ if __name__ == "__main__":
                 except Exception as e:
                     print(f"Error accepting connection: {e}")
     except Exception as e:
-        print(f"Error starting server: {e}")
+        print(f"Error in server: {e}")

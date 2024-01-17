@@ -33,7 +33,7 @@ class Forwarder:
             self.client_socket.close()
             self.server_socket.close()
         except Exception as e:
-            print(f"An unexpected error occurred in Forwarder: {e}")
+            print(f"Failed to create forwarding threads. Error message: {e}")
 
 
 def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.socket, modification_params, name: str):
@@ -49,8 +49,8 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                     to_send = bytearray()
                 from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
             except Exception as e:
-                print(f"Exception encountered in {name} thread: {e}")
-                return
+                print(f"Exception encountered when receiving data in {name} thread. Error message: {e}")
+                raise
             else:
                 if data == b'':
                     break
@@ -64,6 +64,6 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
         if len(to_send) > 0:
             send_segmented(to_socket, to_send, modification_params)
     except Exception as e:
-        print(f"An unexpected error occurred in {name} thread: {e}")
+        print(f"Exception encountered in {name} thread. Shutting down connection.")
     finally:
         forwarder.stop = True
