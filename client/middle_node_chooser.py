@@ -22,8 +22,11 @@ def _get_middle_node_list(overseer_address: str) -> list[str]:
         raise OverseerUnavailableError("Failed to obtain middle nodes list from overseer.") from e
 
 
-def choose_middle_node(overseer_address: str) -> str:
+def choose_middle_node(overseer_address: str, unavailable_middle_nodes: list[str]) -> str:
     middle_nodes = _get_middle_node_list(overseer_address)
+    for node in unavailable_middle_nodes:
+        if node in middle_nodes:
+            middle_nodes.remove(node)
     if len(middle_nodes) == 0:
-        raise MiddleNodeUnavailableError("No PseudoTor middle nodes are registered.")
+        raise MiddleNodeUnavailableError("No available PseudoTor middle nodes are registered.")
     return choice(middle_nodes)
