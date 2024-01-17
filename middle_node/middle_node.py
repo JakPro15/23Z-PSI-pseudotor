@@ -64,7 +64,7 @@ if __name__ == "__main__":
             print("Segmentation param has to be positive")
             exit(1)
         if args.segsize[0] > args.segsize[1]:
-            print("MIN_SEG has to be less than MAX_SEG")
+            print("MIN_SEG has to be less than or equal to MAX_SEG")
             exit(2)
 
     HOST = socket.gethostbyname(args.own_address[0])

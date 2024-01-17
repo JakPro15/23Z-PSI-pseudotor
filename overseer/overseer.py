@@ -1,21 +1,21 @@
 import socket
 import sys
 from threading import Thread
+import argparse
 
 from request_handling import handle_request
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("own_address")
+    args = parser.parse_args()
+
+    HOST = socket.gethostbyname(args.own_address)
+    BUFFER_SIZE = 32
+    PORT = 8001
+
     try:
-        if len(sys.argv) == 2:
-            HOST = socket.gethostbyname(sys.argv[1])
-        else:
-            print("Overseer server takes one argument: HOST - own hostname")
-            exit(1)
-
-        BUFFER_SIZE = 32
-        PORT = 8001
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listening_socket:
             listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             listening_socket.bind((HOST, PORT))
