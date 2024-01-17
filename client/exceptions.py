@@ -4,3 +4,7 @@ class OverseerUnavailableError(Exception):
 
 class MiddleNodeUnavailableError(Exception):
     pass
+
+
+class ServerUnavailableError(Exception):
+    pass

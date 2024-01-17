@@ -2,7 +2,7 @@ import ssl
 import socket
 from middle_node_chooser import choose_middle_node
 from contextlib import contextmanager
-from exceptions import MiddleNodeUnavailableError
+from exceptions import MiddleNodeUnavailableError, ServerUnavailableError
 
 
 MIDDLE_NODE_PORT = 8000
@@ -19,14 +19,25 @@ def pseudotor_wrap(connecting_socket: socket.socket, server_address: str, port: 
     try:
         ssl_socket = context.wrap_socket(connecting_socket)
         ssl_socket.connect((middle_node, MIDDLE_NODE_PORT))
+    except Exception as e:
+        raise MiddleNodeUnavailableError("Failed to establish connection with the middle node.") from e
+
+    try:
         data = bytearray(socket.inet_aton(server_address))
         data.extend(port.to_bytes(2, 'big', signed=False))
         ssl_socket.sendall(data)
         print("Sent server address and port number")
-
-        try:
-            yield ssl_socket
-        finally:
-            ssl_socket.close()
+        data = ssl_socket.recv(2)
     except Exception as e:
-        raise MiddleNodeUnavailableError("Failed to establish connection with the middle node.") from e
+        raise MiddleNodeUnavailableError("Error encountered right after establishing middle node connection.") from e
+    if data == b'OK':
+        print("Connected to server.")
+    elif data == b'NO':
+        raise ServerUnavailableError("Failed to connect to the server.")
+    else:
+        raise MiddleNodeUnavailableError("Invalid response from middle node - connection aborted.")
+
+    try:
+        yield ssl_socket
+    finally:
+        ssl_socket.close()
