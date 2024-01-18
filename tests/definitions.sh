@@ -18,12 +18,3 @@ server() {
     cd "$BASE_DIR/../server" || exit 1
     python "./server.py" "127.0.0.1" "8002"
 }
-
-run_with_interrupt() {
-    command="$1"
-    shift
-    $command "$@" &
-    pid="$!"
-    sleep 5
-    kill -INT "$pid"
-}
