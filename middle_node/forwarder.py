@@ -3,14 +3,18 @@ from threading import Thread
 
 from packet_modifying import send_segmented
 
-
-MAX_DATA_GATHERING_TIME = 0.05
+MAX_DATA_GATHERING_TIME = 0.2
 CHECKING_FOR_STOP_TIMEOUT = 0.5
 BUFFER_SIZE_THRESHOLD = 2000
 
 
 class Forwarder:
-    def __init__(self, client_socket: socket.socket, server_socket: socket.socket, modification_params):
+    def __init__(
+        self,
+        client_socket: socket.socket,
+        server_socket: socket.socket,
+        modification_params,
+    ):
         self.stop = False
         self.client_socket = client_socket
         self.server_socket = server_socket
@@ -19,12 +23,28 @@ class Forwarder:
     def run(self):
         try:
             client_to_server = Thread(
-                None, forward, None,
-                (self, self.client_socket, self.server_socket, self.modification_params, "client_to_server")
+                None,
+                forward,
+                None,
+                (
+                    self,
+                    self.client_socket,
+                    self.server_socket,
+                    self.modification_params,
+                    "client_to_server",
+                ),
             )
             server_to_client = Thread(
-                None, forward, None,
-                (self, self.server_socket, self.client_socket, self.modification_params, "server_to_client")
+                None,
+                forward,
+                None,
+                (
+                    self,
+                    self.server_socket,
+                    self.client_socket,
+                    self.modification_params,
+                    "server_to_client",
+                ),
             )
             client_to_server.start()
             server_to_client.start()
@@ -36,7 +56,13 @@ class Forwarder:
             print(f"Failed to create forwarding threads. Error message: {e}")
 
 
-def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.socket, modification_params, name: str):
+def forward(
+    forwarder: Forwarder,
+    from_socket: socket.socket,
+    to_socket: socket.socket,
+    modification_params,
+    name: str,
+):
     to_send = bytearray()
     from_socket.settimeout(MAX_DATA_GATHERING_TIME)
     try:
@@ -45,23 +71,31 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 data = from_socket.recv(1024)
             except TimeoutError:
                 if len(to_send) > 0:
-                    to_send = send_segmented(to_socket, to_send, modification_params, all=True)
+                    to_send = send_segmented(
+                        to_socket, to_send, modification_params, all=True
+                    )
                 from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
             except Exception as e:
-                print(f"Exception encountered when receiving data in {name} thread. Error message: {e}")
+                print(
+                    f"Exception encountered when receiving data in {name} thread. Error message: {e}"
+                )
                 raise
             else:
-                if data == b'':
+                if data == b"":
                     break
                 if len(to_send) == 0:
                     from_socket.settimeout(MAX_DATA_GATHERING_TIME)
                 to_send.extend(data)
                 if len(to_send) > BUFFER_SIZE_THRESHOLD:
-                    to_send = send_segmented(to_socket, to_send, modification_params, all=False)
+                    to_send = send_segmented(
+                        to_socket, to_send, modification_params, all=False
+                    )
                     from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
         if len(to_send) > 0:
             send_segmented(to_socket, to_send, modification_params, all=True)
     except Exception as e:
-        print(f"Exception encountered in {name} thread. Shutting down connection. Error message: {e}")
+        print(
+            f"Exception encountered in {name} thread. Shutting down connection. Error message: {e}"
+        )
     finally:
         forwarder.stop = True

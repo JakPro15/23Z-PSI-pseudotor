@@ -1,1 +1,2 @@
-docker run -it --net container:z32_project_server nicolaka/netshoot
+#!/bin/sh
+docker run -it --net container:z32_server nicolaka/netshoot
