@@ -45,8 +45,7 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                 data = from_socket.recv(1024)
             except TimeoutError:
                 if len(to_send) > 0:
-                    send_segmented(to_socket, to_send, modification_params)
-                    to_send = bytearray()
+                    to_send = send_segmented(to_socket, to_send, modification_params, all=True)
                 from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
             except Exception as e:
                 print(f"Exception encountered when receiving data in {name} thread. Error message: {e}")
@@ -58,12 +57,11 @@ def forward(forwarder: Forwarder, from_socket: socket.socket, to_socket: socket.
                     from_socket.settimeout(MAX_DATA_GATHERING_TIME)
                 to_send.extend(data)
                 if len(to_send) > BUFFER_SIZE_THRESHOLD:
-                    send_segmented(to_socket, to_send, modification_params)
-                    to_send = bytearray()
+                    to_send = send_segmented(to_socket, to_send, modification_params, all=False)
                     from_socket.settimeout(CHECKING_FOR_STOP_TIMEOUT)
         if len(to_send) > 0:
-            send_segmented(to_socket, to_send, modification_params)
+            send_segmented(to_socket, to_send, modification_params, all=True)
     except Exception as e:
-        print(f"Exception encountered in {name} thread. Shutting down connection.")
+        print(f"Exception encountered in {name} thread. Shutting down connection. Error message: {e}")
     finally:
         forwarder.stop = True

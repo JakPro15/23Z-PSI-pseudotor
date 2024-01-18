@@ -17,10 +17,12 @@ def segment_data(data: bytearray, seg_min: int, seg_max: int) -> list[bytearray]
     return slices
 
 
-def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_params):
+def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_params, all: bool):
     try:
         if modification_params[1] is not None:
             for slice in segment_data(to_send, modification_params[1][0], modification_params[1][1]):
+                if not all and len(slice) < modification_params[1][0]:
+                    return slice
                 sleep(uniform(0, modification_params[0]))
                 to_socket.sendall(slice)
         else:
@@ -29,3 +31,4 @@ def send_segmented(to_socket: socket.socket, to_send: bytearray, modification_pa
     except Exception as e:
         print(f"Exception encountered when sending segmented data. Error message: {e}")
         raise
+    return bytearray()
